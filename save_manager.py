@@ -1,11 +1,14 @@
-import xml.etree.ElementTree as ET, xmltodict, os
+import xml.etree.ElementTree as ET, xmltodict
 
-saveFilePath = 'save_the_world.xml'
+save_file_path = 'save_the_world.xml'
 
-def createSave():
-    savedata = {'savedata': {
+def create_save():
+    """this thing creates a new save file if it doesnt already exist"""
+    save_data = {'save_data': {
         'worldinfo' : {
-            'newplayer' : '1'
+            'newplayer' : '1',
+            'tuitorialstarted' : '0',
+            'tuitorialcheckpoint' : '0'
             },
         'playerstate' : {
             'playername' : 'Player'
@@ -15,28 +18,23 @@ def createSave():
             }
         }
     }
-    file=open(saveFilePath, 'w')
-    xml_string=xmltodict.unparse(savedata)
+    file=open(save_file_path, 'w')
+    xml_string=xmltodict.unparse(save_data)
     file.write(xml_string)
     file.close()
 
-
 def write(section, element, value):
     """this thing saves the thing to the thing :thumbs_up:"""
-    tree = ET.parse(saveFilePath)
-    file = open(saveFilePath,"r+")
-    xml_string=file.read()
-    dict=xmltodict.parse(xml_string)
-    dict["savedata"][section][element]=value
-    file.seek(0)
-    file.truncate()
-    xmltodict.unparse(dict,file)
-    file.close()
-    tree.write(saveFilePath)
+    tree = ET.parse(save_file_path)
+    root = tree.getroot()
+    el = root.find(f'{section}/{element}')
+    if el is not None:
+        el.text = value
+        tree.write(save_file_path)
 
 def read(section, element):
     """this thing reads save value"""
-    tree = ET.parse(saveFilePath)
+    tree = ET.parse(save_file_path)
     root = tree.getroot()
     value = root.find(section + "/" + element).text
     return value
